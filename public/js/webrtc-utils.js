@@ -164,7 +164,8 @@ class WebRTCManager {
         this.createPeerConnection();
       }
       console.log('Setting remote description (offer)');
-      await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+      // Use the offer object directly (RTCSessionDescription is deprecated)
+      await this.peerConnection.setRemoteDescription(offer);
       this.remoteDescriptionSet = true;
       console.log('Remote description set, processing pending ICE candidates:', this.pendingCandidates.length);
 
@@ -195,8 +196,18 @@ class WebRTCManager {
 
   async handleAnswer(answer) {
     try {
+      // Wait for peer connection to be ready
+      if (!this.peerConnection) {
+        console.error('Peer connection not ready for answer');
+        throw new Error('Peer connection not initialized');
+      }
+
       console.log('Setting remote description (answer)');
-      await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+      console.log('Current connection state:', this.peerConnection.connectionState);
+      console.log('Current signaling state:', this.peerConnection.signalingState);
+
+      // Use the answer object directly (RTCSessionDescription is deprecated)
+      await this.peerConnection.setRemoteDescription(answer);
       this.remoteDescriptionSet = true;
       console.log('Answer set successfully, processing pending ICE candidates:', this.pendingCandidates.length);
 

@@ -169,14 +169,15 @@ socket.on('webrtc-ice-candidate', async (data) => {
 // Functions
 function acceptVisitor() {
   socket.emit('accept-visitor');
-  // Initiate WebRTC offer
+  // Initiate WebRTC offer with longer delay to ensure peer connection is ready
   setTimeout(() => {
+    console.log('Creating offer for visitor');
     webrtcManager.createOffer().catch(error => {
       console.error('Error creating offer:', error);
     });
     // Start connection timeout (30 seconds)
     webrtcManager.startConnectionTimeout(30000);
-  }, 500);
+  }, 1000);
 }
 
 function rejectVisitor() {
