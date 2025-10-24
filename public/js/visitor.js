@@ -96,6 +96,9 @@ socket.on('stream-accepted', async () => {
     // Initialize WebRTC WITHOUT getting local media (receive only)
     await webrtcManager.initializeReceiveOnly();
 
+    // Start connection timeout (30 seconds)
+    webrtcManager.startConnectionTimeout(30000);
+
     // Wait for admin to send offer
     console.log('Waiting for admin to start streaming...');
   } catch (error) {

@@ -6,7 +6,10 @@ const RTCConfig = {
     { urls: 'stun:stun2.l.google.com:19302' },
     { urls: 'stun:stun3.l.google.com:19302' },
     { urls: 'stun:stun4.l.google.com:19302' }
-  ]
+  ],
+  iceCandidatePoolSize: 10,
+  bundlePolicy: 'max-bundle',
+  rtcpMuxPolicy: 'require'
 };
 
 class WebRTCManager {
@@ -19,6 +22,8 @@ class WebRTCManager {
     this.remoteStream = null;
     this.remoteDescriptionSet = false;
     this.pendingCandidates = [];
+    this.connectionTimeout = null;
+    this.connectionStartTime = null;
   }
 
   async initialize() {
@@ -54,7 +59,7 @@ class WebRTCManager {
   }
 
   createPeerConnection() {
-    this.peerConnection = new RTCPeerConnection({ iceServers: RTCConfig.iceServers });
+    this.peerConnection = new RTCPeerConnection(RTCConfig);
 
     // Add local stream tracks
     if (this.localStream) {
@@ -88,11 +93,33 @@ class WebRTCManager {
       console.log('ICE connection state:', this.peerConnection.iceConnectionState);
       console.log('ICE gathering state:', this.peerConnection.iceGatheringState);
 
-      if (this.peerConnection.connectionState === 'failed') {
-        console.error('Connection failed - ICE state:', this.peerConnection.iceConnectionState);
-        this.onError('Connection failed. Please try again.');
-      } else if (this.peerConnection.connectionState === 'connected') {
+      if (this.peerConnection.connectionState === 'connected') {
         console.log('Connection established successfully!');
+        // Clear timeout on successful connection
+        if (this.connectionTimeout) {
+          clearTimeout(this.connectionTimeout);
+          this.connectionTimeout = null;
+        }
+      } else if (this.peerConnection.connectionState === 'failed') {
+        console.error('Connection failed - ICE state:', this.peerConnection.iceConnectionState);
+        if (this.connectionTimeout) {
+          clearTimeout(this.connectionTimeout);
+          this.connectionTimeout = null;
+        }
+        this.onError('Connection failed. Please try again.');
+      }
+    };
+
+    // Also monitor ICE connection state
+    this.peerConnection.oniceconnectionstatechange = () => {
+      console.log('ICE connection state changed:', this.peerConnection.iceConnectionState);
+      if (this.peerConnection.iceConnectionState === 'connected' ||
+          this.peerConnection.iceConnectionState === 'completed') {
+        console.log('ICE connection established!');
+        if (this.connectionTimeout) {
+          clearTimeout(this.connectionTimeout);
+          this.connectionTimeout = null;
+        }
       }
     };
 
@@ -195,7 +222,33 @@ class WebRTCManager {
     }
   }
 
+  startConnectionTimeout(timeoutMs = 30000) {
+    console.log('Starting connection timeout:', timeoutMs, 'ms');
+    this.connectionStartTime = Date.now();
+
+    if (this.connectionTimeout) {
+      clearTimeout(this.connectionTimeout);
+    }
+
+    this.connectionTimeout = setTimeout(() => {
+      const elapsed = Date.now() - this.connectionStartTime;
+      console.error('Connection timeout after', elapsed, 'ms');
+
+      if (this.peerConnection &&
+          this.peerConnection.connectionState !== 'connected' &&
+          this.peerConnection.iceConnectionState !== 'connected') {
+        console.error('Forcing connection close due to timeout');
+        this.onError('Connection timeout. The stream took too long to establish.');
+        this.stop();
+      }
+    }, timeoutMs);
+  }
+
   stop() {
+    if (this.connectionTimeout) {
+      clearTimeout(this.connectionTimeout);
+      this.connectionTimeout = null;
+    }
     if (this.localStream) {
       this.localStream.getTracks().forEach(track => track.stop());
     }
