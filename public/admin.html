@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Live Stream Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>👨‍💼 Admin Dashboard</h1>
+      <p>Manage visitor queue and live stream</p>
+    </div>
+
+    <div class="status">
+      <div class="status-item" id="statusAdmin">
+        <label>Admin Status</label>
+        <div class="value">Connecting...</div>
+      </div>
+      <div class="status-item" id="statusQueue">
+        <label>Queue Length</label>
+        <div class="value">0</div>
+      </div>
+      <div class="status-item" id="statusStream">
+        <label>Stream Status</label>
+        <div class="value">Idle</div>
+      </div>
+    </div>
+
+    <div id="messageBox"></div>
+
+    <!-- Queue Controls Section -->
+    <div id="queueControlsSection">
+      <div class="info-box">
+        <strong>Next Visitor:</strong> <span id="nextVisitorName">Waiting for visitors...</span>
+      </div>
+      <div class="controls">
+        <button class="btn-success" id="acceptBtn" onclick="acceptVisitor()">✓ Accept Visitor</button>
+        <button class="btn-danger" id="rejectBtn" onclick="rejectVisitor()">✗ Reject Visitor</button>
+      </div>
+    </div>
+
+    <!-- Video Section -->
+    <div id="videoSection" style="display: none;">
+      <div class="info-box">
+        <strong>Streaming with:</strong> <span id="currentVisitorName">-</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+        <div>
+          <p style="text-align: center; color: #666; margin-bottom: 10px; font-weight: 600;">📹 You (Admin)</p>
+          <div class="video-container" style="margin: 0;">
+            <video id="localVideo" autoplay muted playsinline></video>
+          </div>
+        </div>
+
+        <div>
+          <p style="text-align: center; color: #666; margin-bottom: 10px; font-weight: 600;">👤 Visitor</p>
+          <div class="video-container" style="margin: 0;">
+            <video id="remoteVideo" autoplay playsinline></video>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn-secondary" id="endStreamBtn" onclick="endStream()">End Stream</button>
+      </div>
+    </div>
+
+    <div id="noQueueMessage" class="info-box" style="text-align: center;">
+      Waiting for visitors to join the queue...
+    </div>
+
+    <div class="queue-section" id="queueSection">
+      <h3>📋 Visitor Queue</h3>
+      <ul class="queue-list" id="queueList">
+        <li class="queue-item" style="color: #999;">No visitors in queue</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Hidden remote video element for admin -->
+  <video id="remoteVideo" style="display: none;"></video>
+
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script src="/js/webrtc-utils.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>
+

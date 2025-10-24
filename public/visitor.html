@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visitor - Live Chat with Admin</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>💬 Chat with Admin</h1>
+      <p>Join the queue to stream with an available admin</p>
+    </div>
+
+    <div class="status">
+      <div class="status-item" id="statusConnection">
+        <label>Connection</label>
+        <div class="value">Connecting...</div>
+      </div>
+      <div class="status-item" id="statusPosition">
+        <label>Queue Position</label>
+        <div class="value">-</div>
+      </div>
+      <div class="status-item" id="statusAdmin">
+        <label>Admin Available</label>
+        <div class="value">Checking...</div>
+      </div>
+    </div>
+
+    <div id="messageBox"></div>
+
+    <!-- Join Queue Section -->
+    <div id="joinQueueSection">
+      <div class="info-box">
+        Enter your name and join the queue to stream with an admin.
+      </div>
+      <div class="input-group">
+        <input type="text" id="visitorName" placeholder="Enter your name" value="Visitor">
+        <button class="btn-primary" onclick="joinQueue()">Join Queue</button>
+      </div>
+    </div>
+
+    <!-- Waiting Section -->
+    <div id="waitingSection" style="display: none;">
+      <div class="info-box">
+        You are in the queue. Please wait for an admin to accept your request.
+      </div>
+      <div style="text-align: center; margin: 30px 0;">
+        <div style="font-size: 48px; margin-bottom: 20px;">⏳</div>
+        <p style="font-size: 18px; color: #666; margin-bottom: 20px;">
+          Position in queue: <strong id="queuePos">-</strong>
+        </p>
+        <button class="btn-secondary" onclick="leaveQueue()">Leave Queue</button>
+      </div>
+    </div>
+
+    <!-- Stream Section -->
+    <div id="streamSection" style="display: none;">
+      <div class="info-box">
+        <strong>📹 Admin Live Stream</strong> - Watch the admin's live broadcast
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <p style="text-align: center; color: #666; margin-bottom: 10px; font-weight: 600;">👨‍💼 Admin Live</p>
+        <div class="video-container" style="margin: 0; position: relative;">
+          <video id="remoteVideo" autoplay playsinline></video>
+          <div id="adminConnectingIndicator" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white; z-index: 10;">
+            <div style="font-size: 48px; margin-bottom: 10px;">⏳</div>
+            <p>Connecting to Admin Live Stream...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn-danger" onclick="endStream()">Leave Stream</button>
+      </div>
+    </div>
+
+    <!-- Rejected Section -->
+    <div id="rejectedSection" style="display: none;">
+      <div style="text-align: center; padding: 40px;">
+        <div style="font-size: 48px; margin-bottom: 20px;">❌</div>
+        <p style="font-size: 18px; color: #666; margin-bottom: 20px;">
+          Your request was rejected by the admin.
+        </p>
+        <button class="btn-primary" onclick="rejoinQueue()">Try Again</button>
+      </div>
+    </div>
+
+    <div class="queue-section">
+      <h3>📊 Queue Status</h3>
+      <div id="queueStatus" style="padding: 15px; background: white; border-radius: 4px; text-align: center;">
+        <p style="color: #666;">Waiting for queue update...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script src="/js/webrtc-utils.js"></script>
+  <script src="/js/visitor.js"></script>
+</body>
+</html>
+
