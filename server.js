@@ -10,7 +10,13 @@ const io = socketIo(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
-  }
+  },
+  transports: ['websocket', 'polling'],
+  pingInterval: 25000,
+  pingTimeout: 60000,
+  upgradeTimeout: 10000,
+  maxHttpBufferSize: 1e6,
+  allowEIO3: true
 });
 
 // Middleware

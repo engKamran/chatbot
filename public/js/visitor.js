@@ -1,22 +1,47 @@
 // Visitor Client Logic
-const socket = io();
+const socket = io({
+  reconnection: true,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
+  reconnectionAttempts: 5,
+  transports: ['websocket', 'polling']
+});
 let webrtcManager = null;
 let isInQueue = false;
 let isStreaming = false;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-  updateConnectionStatus('Connected', 'active');
+  updateConnectionStatus('Connecting...', 'inactive');
   updateAdminStatus('Checking...', 'inactive');
 });
 
 // Socket events
 socket.on('connect', () => {
+  console.log('Connected to server:', socket.id);
   updateConnectionStatus('Connected', 'active');
+  showMessage('Connected to server!', 'success');
 });
 
 socket.on('disconnect', () => {
+  console.log('Disconnected from server');
   updateConnectionStatus('Disconnected', 'inactive');
+  showMessage('Disconnected from server', 'error');
+});
+
+socket.on('connect_error', (error) => {
+  console.error('Connection error:', error);
+  showMessage('Connection error: ' + error.message, 'error');
+});
+
+socket.on('reconnect_attempt', () => {
+  console.log('Attempting to reconnect...');
+  showMessage('Reconnecting...', 'info');
+});
+
+socket.on('reconnect', () => {
+  console.log('Reconnected to server');
+  showMessage('Reconnected!', 'success');
 });
 
 socket.on('queue-position', (data) => {

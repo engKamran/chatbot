@@ -1,5 +1,11 @@
 // Admin Client Logic
-const socket = io();
+const socket = io({
+  reconnection: true,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
+  reconnectionAttempts: 5,
+  transports: ['websocket', 'polling']
+});
 let webrtcManager = null;
 let isStreaming = false;
 let currentVisitor = null;
@@ -32,6 +38,34 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (error) {
     showMessage('Failed to initialize: ' + error.message, 'error');
   }
+});
+
+// Connection events
+socket.on('connect', () => {
+  console.log('Connected to server:', socket.id);
+  updateStatus('Admin Status', 'Connected', 'statusAdmin');
+  socket.emit('admin-join');
+});
+
+socket.on('disconnect', () => {
+  console.log('Disconnected from server');
+  updateStatus('Admin Status', 'Disconnected', 'statusAdmin');
+});
+
+socket.on('connect_error', (error) => {
+  console.error('Connection error:', error);
+  showMessage('Connection error: ' + error.message, 'error');
+});
+
+socket.on('reconnect_attempt', () => {
+  console.log('Attempting to reconnect...');
+  showMessage('Reconnecting...', 'info');
+});
+
+socket.on('reconnect', () => {
+  console.log('Reconnected to server');
+  showMessage('Reconnected!', 'success');
+  socket.emit('admin-join');
 });
 
 // Socket events
