@@ -83,8 +83,14 @@ class WebRTCManager {
     // Handle connection state changes
     this.peerConnection.onconnectionstatechange = () => {
       console.log('Connection state:', this.peerConnection.connectionState);
+      console.log('ICE connection state:', this.peerConnection.iceConnectionState);
+      console.log('ICE gathering state:', this.peerConnection.iceGatheringState);
+
       if (this.peerConnection.connectionState === 'failed') {
+        console.error('Connection failed - ICE state:', this.peerConnection.iceConnectionState);
         this.onError('Connection failed. Please try again.');
+      } else if (this.peerConnection.connectionState === 'connected') {
+        console.log('Connection established successfully!');
       }
     };
 
@@ -113,24 +119,30 @@ class WebRTCManager {
       if (!this.peerConnection) {
         this.createPeerConnection();
       }
+      console.log('Setting remote description (offer)');
       await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+      console.log('Creating answer');
       const answer = await this.peerConnection.createAnswer();
+      console.log('Setting local description (answer)');
       await this.peerConnection.setLocalDescription(answer);
+      console.log('Sending answer');
       this.socket.emit('webrtc-answer', { answer });
       return answer;
     } catch (error) {
       console.error('Error handling offer:', error);
-      this.onError('Error handling offer');
+      this.onError('Error handling offer: ' + error.message);
       throw error;
     }
   }
 
   async handleAnswer(answer) {
     try {
+      console.log('Setting remote description (answer)');
       await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+      console.log('Answer set successfully');
     } catch (error) {
       console.error('Error handling answer:', error);
-      this.onError('Error handling answer');
+      this.onError('Error handling answer: ' + error.message);
       throw error;
     }
   }
@@ -138,10 +150,13 @@ class WebRTCManager {
   async handleIceCandidate(candidate) {
     try {
       if (this.peerConnection && candidate) {
+        console.log('Adding ICE candidate');
         await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        console.log('ICE candidate added successfully');
       }
     } catch (error) {
       console.error('Error adding ICE candidate:', error);
+      // Don't throw - ICE candidate errors are often non-fatal
     }
   }
 
