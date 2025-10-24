@@ -34,12 +34,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Get local media
     try {
       const localStream = await webrtcManager.initialize();
-      const videoElement = document.getElementById('localVideo');
-      if (videoElement) {
-        videoElement.srcObject = localStream;
-        console.log('Local stream set successfully');
+      // Use hidden video element for initialization to ensure stream is active
+      const hiddenVideoElement = document.getElementById('localVideoHidden');
+      if (hiddenVideoElement) {
+        hiddenVideoElement.srcObject = localStream;
+        console.log('Local stream initialized on hidden element');
       } else {
-        console.error('Video element not found');
+        console.error('Hidden video element not found');
       }
     } catch (mediaError) {
       console.error('Media access error:', mediaError);
@@ -117,6 +118,14 @@ socket.on('visitor-accepted', (data) => {
   document.getElementById('queueControlsSection').style.display = 'none';
   document.getElementById('videoSection').style.display = 'block';
   document.getElementById('queueSection').style.display = 'none';
+
+  // Move stream from hidden element to visible element
+  const hiddenVideoElement = document.getElementById('localVideoHidden');
+  const visibleVideoElement = document.getElementById('localVideo');
+  if (hiddenVideoElement && visibleVideoElement && hiddenVideoElement.srcObject) {
+    visibleVideoElement.srcObject = hiddenVideoElement.srcObject;
+    console.log('Local stream moved to visible video element');
+  }
 
   showMessage('Connected with ' + data.visitorName + '! Starting stream...', 'success');
 
