@@ -15,7 +15,7 @@ const io = socketIo(server, {
 
 // Middleware
 app.use(cors());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Allow embedding in iframes
 app.use((req, res, next) => {
@@ -34,6 +34,15 @@ let activeStream = null;
 // Routes
 app.get('/', (req, res) => {
   res.send('Streaming Chatbot Server Running');
+});
+
+// Serve HTML files explicitly
+app.get('/admin.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+app.get('/visitor.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'visitor.html'));
 });
 
 // Socket.io events
