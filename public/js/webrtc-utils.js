@@ -17,6 +17,8 @@ class WebRTCManager {
     this.peerConnection = null;
     this.localStream = null;
     this.remoteStream = null;
+    this.remoteDescriptionSet = false;
+    this.pendingCandidates = [];
   }
 
   async initialize() {
@@ -121,6 +123,20 @@ class WebRTCManager {
       }
       console.log('Setting remote description (offer)');
       await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+      this.remoteDescriptionSet = true;
+      console.log('Remote description set, processing pending ICE candidates:', this.pendingCandidates.length);
+
+      // Process any pending ICE candidates
+      for (const candidate of this.pendingCandidates) {
+        try {
+          await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+          console.log('Added pending ICE candidate');
+        } catch (error) {
+          console.error('Error adding pending ICE candidate:', error);
+        }
+      }
+      this.pendingCandidates = [];
+
       console.log('Creating answer');
       const answer = await this.peerConnection.createAnswer();
       console.log('Setting local description (answer)');
@@ -139,7 +155,19 @@ class WebRTCManager {
     try {
       console.log('Setting remote description (answer)');
       await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-      console.log('Answer set successfully');
+      this.remoteDescriptionSet = true;
+      console.log('Answer set successfully, processing pending ICE candidates:', this.pendingCandidates.length);
+
+      // Process any pending ICE candidates
+      for (const candidate of this.pendingCandidates) {
+        try {
+          await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+          console.log('Added pending ICE candidate');
+        } catch (error) {
+          console.error('Error adding pending ICE candidate:', error);
+        }
+      }
+      this.pendingCandidates = [];
     } catch (error) {
       console.error('Error handling answer:', error);
       this.onError('Error handling answer: ' + error.message);
@@ -150,6 +178,13 @@ class WebRTCManager {
   async handleIceCandidate(candidate) {
     try {
       if (this.peerConnection && candidate) {
+        // Queue candidates if remote description not set yet
+        if (!this.remoteDescriptionSet) {
+          console.log('Remote description not set yet, queueing ICE candidate');
+          this.pendingCandidates.push(candidate);
+          return;
+        }
+
         console.log('Adding ICE candidate');
         await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
         console.log('ICE candidate added successfully');
