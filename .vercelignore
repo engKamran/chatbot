@@ -1,0 +1,20 @@
+# Don't ignore public folder - we need it!
+# .vercelignore is used to exclude files from deployment
+# By default, node_modules is excluded, but we want everything else
+
+# Exclude these:
+.git
+.gitignore
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.env.local
+.DS_Store
+
+# Keep everything else including:
+# - public/
+# - server.js
+# - package.json
+# - vercel.json
+
