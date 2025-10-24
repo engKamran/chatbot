@@ -146,6 +146,7 @@ io.on('connection', (socket) => {
   // WebRTC signaling - answer
   socket.on('webrtc-answer', (data) => {
     console.log('Received answer from:', socket.id);
+    console.log('Active stream:', activeStream ? `admin=${activeStream.adminId}, visitor=${activeStream.visitorId}` : 'null');
     if (activeStream) {
       const targetId = activeStream.visitorId === socket.id ? activeStream.adminId : activeStream.visitorId;
       console.log('Relaying answer to:', targetId);
