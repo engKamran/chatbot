@@ -128,6 +128,11 @@ video {
   display: none;
 }
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .video-placeholder {
   color: #999;
   font-size: 16px;

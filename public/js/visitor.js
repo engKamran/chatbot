@@ -64,7 +64,12 @@ socket.on('stream-accepted', async () => {
   isStreaming = true;
   document.getElementById('waitingSection').style.display = 'none';
   document.getElementById('streamSection').style.display = 'block';
-  showMessage('Admin is now live! Connecting to stream...', 'success');
+
+  // Show loading screen
+  const loadingScreen = document.getElementById('loadingScreen');
+  if (loadingScreen) {
+    loadingScreen.style.display = 'flex';
+  }
 
   try {
     // Initialize WebRTC - RECEIVE ONLY (no local media)
@@ -73,10 +78,16 @@ socket.on('stream-accepted', async () => {
       (remoteStream) => {
         const remoteVideo = document.getElementById('remoteVideo');
         remoteVideo.srcObject = remoteStream;
-        showMessage('Connected to Admin Live Stream! 📹', 'success');
+
+        // Hide loading screen when stream is received
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) {
+          loadingScreen.style.display = 'none';
+        }
+        console.log('Admin stream received and playing');
       },
       (error) => {
-        showMessage(error, 'error');
+        console.error('WebRTC Error:', error);
       }
     );
 
@@ -86,8 +97,14 @@ socket.on('stream-accepted', async () => {
     // Wait for admin to send offer
     console.log('Waiting for admin to start streaming...');
   } catch (error) {
-    showMessage('Failed to connect to stream: ' + error.message, 'error');
-    endStream();
+    console.error('Stream connection error:', error);
+    const loadingScreen = document.getElementById('loadingScreen');
+    if (loadingScreen) {
+      loadingScreen.innerHTML = '<div style="text-align: center; color: white;"><p>Failed to connect to stream</p></div>';
+    }
+    setTimeout(() => {
+      endStream();
+    }, 2000);
   }
 });
 

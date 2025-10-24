@@ -27,19 +27,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       },
       (error) => {
-        showMessage(error, 'error');
+        console.error('WebRTC Error:', error);
       }
     );
 
     // Get local media
-    const localStream = await webrtcManager.initialize();
-    const videoElement = document.getElementById('localVideo');
-    videoElement.srcObject = localStream;
+    try {
+      const localStream = await webrtcManager.initialize();
+      const videoElement = document.getElementById('localVideo');
+      if (videoElement) {
+        videoElement.srcObject = localStream;
+        console.log('Local stream set successfully');
+      } else {
+        console.error('Video element not found');
+      }
+    } catch (mediaError) {
+      console.error('Media access error:', mediaError);
+      alert('Please allow camera access to use the admin dashboard');
+    }
 
     // Connect as admin
     socket.emit('admin-join');
   } catch (error) {
-    showMessage('Failed to initialize: ' + error.message, 'error');
+    console.error('Initialization error:', error);
   }
 });
 
