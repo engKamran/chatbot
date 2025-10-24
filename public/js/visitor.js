@@ -188,7 +188,6 @@ function updateStatus(label, value, elementId) {
 }
 
 function updateConnectionStatus(status, type) {
-  updateStatus('Connection', status, 'statusConnection');
   const element = document.getElementById('statusConnection');
   if (element) {
     element.classList.remove('active', 'inactive');
@@ -197,7 +196,6 @@ function updateConnectionStatus(status, type) {
 }
 
 function updateAdminStatus(status, type) {
-  updateStatus('Admin Available', status, 'statusAdmin');
   const element = document.getElementById('statusAdmin');
   if (element) {
     element.classList.remove('active', 'inactive');

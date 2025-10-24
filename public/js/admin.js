@@ -183,13 +183,18 @@ function endStream() {
 function updateStatus(label, value, elementId) {
   const element = document.getElementById(elementId);
   if (element) {
-    element.querySelector('.value').textContent = value;
-    if (value === 'Connected' || value === 'Active') {
-      element.classList.add('active');
-      element.classList.remove('inactive');
-    } else if (value === 'Disconnected' || value === 'Idle') {
-      element.classList.add('inactive');
-      element.classList.remove('active');
+    // For status indicators, keep the dot
+    if (elementId === 'statusAdmin' || elementId === 'statusStream') {
+      if (value === 'Connected' || value === 'Active') {
+        element.classList.add('active');
+        element.classList.remove('inactive');
+      } else if (value === 'Disconnected' || value === 'Idle') {
+        element.classList.add('inactive');
+        element.classList.remove('active');
+      }
+    } else {
+      // For queue length, show the number
+      element.querySelector('.value').textContent = value;
     }
   }
 }

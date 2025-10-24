@@ -15,16 +15,16 @@
 
     <div class="status">
       <div class="status-item" id="statusAdmin">
-        <label>Admin Status</label>
-        <div class="value">Connecting...</div>
+        <label>Status</label>
+        <div class="value">●</div>
       </div>
       <div class="status-item" id="statusQueue">
-        <label>Queue Length</label>
+        <label>Queue</label>
         <div class="value">0</div>
       </div>
       <div class="status-item" id="statusStream">
-        <label>Stream Status</label>
-        <div class="value">Idle</div>
+        <label>Stream</label>
+        <div class="value">●</div>
       </div>
     </div>
 
@@ -47,19 +47,9 @@
         <strong>Streaming with:</strong> <span id="currentVisitorName">-</span>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-        <div>
-          <p style="text-align: center; color: #666; margin-bottom: 10px; font-weight: 600;">📹 You (Admin)</p>
-          <div class="video-container" style="margin: 0;">
-            <video id="localVideo" autoplay muted playsinline></video>
-          </div>
-        </div>
-
-        <div>
-          <p style="text-align: center; color: #666; margin-bottom: 10px; font-weight: 600;">👤 Visitor</p>
-          <div class="video-container" style="margin: 0;">
-            <video id="remoteVideo" autoplay playsinline></video>
-          </div>
+      <div style="margin-bottom: 20px;">
+        <div class="video-container" style="margin: 0; aspect-ratio: 16/9;">
+          <video id="localVideo" autoplay muted playsinline></video>
         </div>
       </div>
 
