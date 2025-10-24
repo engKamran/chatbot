@@ -141,6 +141,7 @@ socket.on('stream-ended', () => {
 
 socket.on('webrtc-offer', async (data) => {
   try {
+    console.log('Admin received offer');
     await webrtcManager.handleOffer(data.offer);
   } catch (error) {
     console.error('Error handling offer:', error);
@@ -149,6 +150,7 @@ socket.on('webrtc-offer', async (data) => {
 
 socket.on('webrtc-answer', async (data) => {
   try {
+    console.log('Admin received answer');
     await webrtcManager.handleAnswer(data.answer);
   } catch (error) {
     console.error('Error handling answer:', error);
@@ -157,6 +159,7 @@ socket.on('webrtc-answer', async (data) => {
 
 socket.on('webrtc-ice-candidate', async (data) => {
   try {
+    console.log('Admin received ICE candidate');
     await webrtcManager.handleIceCandidate(data.candidate);
   } catch (error) {
     console.error('Error handling ICE candidate:', error);

@@ -133,17 +133,25 @@ io.on('connection', (socket) => {
 
   // WebRTC signaling - offer
   socket.on('webrtc-offer', (data) => {
+    console.log('Received offer from:', socket.id);
     if (activeStream) {
       const targetId = activeStream.visitorId === socket.id ? activeStream.adminId : activeStream.visitorId;
+      console.log('Relaying offer to:', targetId);
       io.to(targetId).emit('webrtc-offer', data);
+    } else {
+      console.log('No active stream, cannot relay offer');
     }
   });
 
   // WebRTC signaling - answer
   socket.on('webrtc-answer', (data) => {
+    console.log('Received answer from:', socket.id);
     if (activeStream) {
       const targetId = activeStream.visitorId === socket.id ? activeStream.adminId : activeStream.visitorId;
+      console.log('Relaying answer to:', targetId);
       io.to(targetId).emit('webrtc-answer', data);
+    } else {
+      console.log('No active stream, cannot relay answer');
     }
   });
 
