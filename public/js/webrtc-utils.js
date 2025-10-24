@@ -5,7 +5,13 @@ const RTCConfig = {
     { urls: 'stun:stun1.l.google.com:19302' },
     { urls: 'stun:stun2.l.google.com:19302' },
     { urls: 'stun:stun3.l.google.com:19302' },
-    { urls: 'stun:stun4.l.google.com:19302' }
+    { urls: 'stun:stun4.l.google.com:19302' },
+    // Public TURN server as fallback
+    {
+      urls: ['turn:numb.viagenie.ca'],
+      username: 'webrtc@live.com',
+      credential: 'muazkh'
+    }
   ],
   iceCandidatePoolSize: 10,
   bundlePolicy: 'max-bundle',
@@ -81,9 +87,12 @@ class WebRTCManager {
     // Handle ICE candidates
     this.peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
+        console.log('New ICE candidate:', event.candidate.candidate.substring(0, 50) + '...');
         this.socket.emit('webrtc-ice-candidate', {
           candidate: event.candidate
         });
+      } else {
+        console.log('ICE gathering complete');
       }
     };
 
@@ -134,6 +143,12 @@ class WebRTCManager {
         offerToReceiveVideo: true
       });
       await this.peerConnection.setLocalDescription(offer);
+
+      // Wait a bit for initial ICE candidates to be gathered
+      console.log('Waiting for initial ICE candidates...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      console.log('Sending offer');
       this.socket.emit('webrtc-offer', { offer });
       return offer;
     } catch (error) {
