@@ -79,12 +79,14 @@ socket.on('stream-accepted', async () => {
         const remoteVideo = document.getElementById('remoteVideo');
         remoteVideo.srcObject = remoteStream;
 
-        // Hide loading screen when stream is received
-        const loadingScreen = document.getElementById('loadingScreen');
-        if (loadingScreen) {
-          loadingScreen.style.display = 'none';
-        }
-        console.log('Admin stream received and playing');
+        // Hide loading screen when video starts playing
+        remoteVideo.onloadedmetadata = () => {
+          const loadingScreen = document.getElementById('loadingScreen');
+          if (loadingScreen) {
+            loadingScreen.style.display = 'none';
+          }
+          console.log('Admin stream loaded and playing');
+        };
       },
       (error) => {
         console.error('WebRTC Error:', error);

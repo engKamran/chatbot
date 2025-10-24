@@ -91,17 +91,19 @@ socket.on('queue-update', (data) => {
   updateStatus('Queue Length', data.queueLength.toString(), 'statusQueue');
   updateQueueList(data.visitors);
 
-  // Update next visitor name
+  // Update next visitor name and show/hide controls
   if (data.visitors && data.visitors.length > 0) {
     document.getElementById('nextVisitorName').textContent = data.visitors[0].name;
+    // Show accept/reject buttons only when there are visitors in queue and not streaming
+    if (!isStreaming) {
+      document.getElementById('queueControlsSection').style.display = 'block';
+    }
   } else {
     document.getElementById('nextVisitorName').textContent = 'Waiting for visitors...';
-  }
-
-  if (data.queueLength > 0 && !isStreaming) {
-    document.getElementById('queueControlsSection').style.display = 'block';
-  } else if (data.queueLength === 0 && !isStreaming) {
-    document.getElementById('queueControlsSection').style.display = 'block';
+    // Hide accept/reject buttons when queue is empty
+    if (!isStreaming) {
+      document.getElementById('queueControlsSection').style.display = 'none';
+    }
   }
 });
 
