@@ -1,12 +1,13 @@
 // Visitor Client Logic
+// Note: Vercel doesn't support long-lived connections
+// For production, use Railway, Render, Heroku, or DigitalOcean
 const socket = io({
   reconnection: true,
-  reconnectionDelay: 500,
-  reconnectionDelayMax: 3000,
-  reconnectionAttempts: 10,
-  transports: ['polling', 'websocket'],  // polling first for Vercel
-  upgrade: true,
-  rememberUpgrade: true
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
+  reconnectionAttempts: 5,
+  transports: ['websocket'],  // WebSocket only
+  upgrade: false
 });
 let webrtcManager = null;
 let isInQueue = false;

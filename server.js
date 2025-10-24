@@ -7,20 +7,24 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 
-// Socket.io configuration optimized for Vercel
+// Socket.io configuration - Vercel doesn't support long-lived connections
+// This app requires a server that supports WebSocket connections
+// Consider using: Railway, Render, Heroku, or DigitalOcean instead of Vercel
 const io = socketIo(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
-    credentials: false
+    credentials: false,
+    allowEIO3: true
   },
-  transports: ['polling', 'websocket'],  // polling first for Vercel
-  pingInterval: 10000,
-  pingTimeout: 5000,
+  transports: ['websocket'],  // WebSocket only - polling doesn't work on Vercel
+  pingInterval: 25000,
+  pingTimeout: 60000,
   upgradeTimeout: 10000,
   maxHttpBufferSize: 1e6,
   allowEIO3: true,
-  serveClient: false
+  serveClient: false,
+  connectTimeout: 45000
 });
 
 // Middleware
