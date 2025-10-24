@@ -1,10 +1,12 @@
 // Admin Client Logic
 const socket = io({
   reconnection: true,
-  reconnectionDelay: 1000,
-  reconnectionDelayMax: 5000,
-  reconnectionAttempts: 5,
-  transports: ['websocket', 'polling']
+  reconnectionDelay: 500,
+  reconnectionDelayMax: 3000,
+  reconnectionAttempts: 10,
+  transports: ['polling', 'websocket'],  // polling first for Vercel
+  upgrade: true,
+  rememberUpgrade: true
 });
 let webrtcManager = null;
 let isStreaming = false;
