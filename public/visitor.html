@@ -25,62 +25,65 @@
 
     <!-- Chat Content -->
     <div class="chatbox-content">
-      <!-- Join Queue Section -->
-      <div id="joinQueueSection" class="chat-section">
-        <div class="chat-message-center">
-          <div style="font-size: 48px; margin-bottom: 20px;">👋</div>
-          <h3>Welcome to Admin Support</h3>
-          <p>Enter your name and join the queue to chat with an available admin</p>
-          <div class="input-group" style="margin-top: 20px;">
-            <input type="text" id="visitorName" placeholder="Your name" value="Visitor">
-            <button class="btn-primary" onclick="joinQueue()">Join Queue</button>
+      <!-- Messages Area -->
+      <div id="messagesArea" class="messages-area">
+        <div class="message-group welcome-message">
+          <div class="message-avatar">👋</div>
+          <div class="message-content">
+            <p><strong>Welcome to Admin Support!</strong></p>
+            <p>Enter your name below to get started. You can chat with our AI assistant while waiting for an admin.</p>
           </div>
+        </div>
+      </div>
+
+      <!-- Join Queue Section -->
+      <div id="joinQueueSection" class="chat-input-section">
+        <div class="input-group-inline">
+          <input type="text" id="visitorName" placeholder="Your name" value="Visitor" class="chat-name-input">
+          <button class="btn-primary btn-icon" onclick="joinQueue()" title="Join Queue">→</button>
         </div>
       </div>
 
       <!-- Waiting Section -->
-      <div id="waitingSection" style="display: none;" class="chat-section">
-        <div class="chat-message-center">
-          <div style="font-size: 48px; margin-bottom: 20px; animation: spin 2s linear infinite;">⏳</div>
-          <h3>Waiting for Admin</h3>
-          <p>You're in the queue</p>
-          <div class="queue-position-badge">
-            Position: <strong id="queuePos">-</strong>
-          </div>
-          <button class="btn-secondary" onclick="leaveQueue()" style="margin-top: 20px;">Leave Queue</button>
+      <div id="waitingSection" style="display: none;" class="chat-input-section">
+        <div class="queue-info">
+          <p>Position in queue: <strong id="queuePos">-</strong></p>
+          <button class="btn-secondary btn-small" onclick="leaveQueue()">Leave Queue</button>
         </div>
       </div>
 
       <!-- Stream Section -->
-      <div id="streamSection" style="display: none;" class="chat-section">
-        <div class="video-container-chat" style="position: relative;">
+      <div id="streamSection" style="display: none;" class="chat-input-section">
+        <div class="video-container-chat" style="position: relative; height: 300px;">
           <video id="remoteVideo" autoplay playsinline></video>
 
           <!-- Loading Screen -->
           <div id="loadingScreen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20;">
             <div style="text-align: center; color: white;">
               <div style="font-size: 48px; margin-bottom: 20px; animation: spin 2s linear infinite;">⏳</div>
-              <p style="font-size: 16px; margin-bottom: 10px;">Connecting to Admin Stream...</p>
-              <p style="font-size: 12px; color: #999;">Please wait while we establish the connection</p>
+              <p style="font-size: 14px; margin-bottom: 10px;">Connecting to Admin Stream...</p>
+              <p style="font-size: 11px; color: #999;">Please wait while we establish the connection</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Rejected Section -->
-      <div id="rejectedSection" style="display: none;" class="chat-section">
-        <div class="chat-message-center">
-          <div style="font-size: 48px; margin-bottom: 20px;">❌</div>
-          <h3>Request Rejected</h3>
-          <p>The admin declined your request</p>
-          <button class="btn-primary" onclick="rejoinQueue()" style="margin-top: 20px;">Try Again</button>
+      <div id="rejectedSection" style="display: none;" class="chat-input-section">
+        <div class="rejection-message">
+          <p>❌ Your request was rejected by the admin</p>
+          <button class="btn-primary btn-small" onclick="rejoinQueue()">Try Again</button>
         </div>
       </div>
     </div>
 
     <!-- Chat Footer -->
-    <div class="chatbox-footer" id="chatboxFooter" style="display: none;">
-      <button class="btn-danger btn-full" onclick="endStream()">Leave Stream</button>
+    <div class="chatbox-footer">
+      <div class="chat-input-wrapper">
+        <input type="text" id="messageInput" placeholder="Type a message..." class="message-input" onkeypress="handleMessageKeypress(event)">
+        <button class="btn-send" onclick="sendMessage()" title="Send message">📤</button>
+      </div>
+      <button class="btn-danger btn-full" id="leaveStreamBtn" onclick="endStream()" style="display: none;">Leave Stream</button>
     </div>
   </div>
 

@@ -12,6 +12,21 @@ const socket = io({
 let webrtcManager = null;
 let isInQueue = false;
 let isStreaming = false;
+let visitorName = 'Visitor';
+
+// AI Dummy responses
+const aiResponses = [
+  "Thanks for reaching out! How can I help you today?",
+  "I'm here to assist you. What do you need?",
+  "Great question! Let me help you with that.",
+  "I understand. Can you tell me more about your issue?",
+  "That's a common question. Here's what I can help with...",
+  "I'm processing your request. Please wait a moment.",
+  "Thanks for your patience. An admin will be with you shortly.",
+  "Is there anything else I can help you with?",
+  "I appreciate your feedback. Let me escalate this to an admin.",
+  "You're welcome! Feel free to ask if you need anything else."
+];
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -63,8 +78,11 @@ socket.on('queue-update', (data) => {
 socket.on('stream-accepted', async () => {
   isStreaming = true;
   document.getElementById('waitingSection').style.display = 'none';
-  document.getElementById('streamSection').style.display = 'flex';
-  document.getElementById('chatboxFooter').style.display = 'block';
+  document.getElementById('streamSection').style.display = 'block';
+  document.getElementById('leaveStreamBtn').style.display = 'block';
+
+  // Add admin accepted message
+  addMessageToChat('🎉 An admin has accepted your request! You can now see their live stream below.', false);
 
   // Show loading screen
   const loadingScreen = document.getElementById('loadingScreen');
@@ -165,7 +183,16 @@ function joinQueue() {
     showMessage('Please enter your name', 'error');
     return;
   }
-  
+
+  visitorName = name;
+
+  // Hide join section and show waiting section
+  document.getElementById('joinQueueSection').style.display = 'none';
+  document.getElementById('waitingSection').style.display = 'block';
+
+  // Add greeting message
+  addMessageToChat(`Hi ${name}! 👋 Welcome to our support chat. You're now in the queue. An admin will be with you shortly. In the meantime, feel free to ask me anything!`, false);
+
   socket.emit('visitor-join', { name });
   showMessage('Joined queue as ' + name, 'success');
 }
@@ -189,13 +216,15 @@ function endStream() {
   isStreaming = false;
 
   document.getElementById('streamSection').style.display = 'none';
-  document.getElementById('chatboxFooter').style.display = 'none';
-  document.getElementById('joinQueueSection').style.display = 'flex';
+  document.getElementById('leaveStreamBtn').style.display = 'none';
+  document.getElementById('joinQueueSection').style.display = 'block';
+
+  addMessageToChat('👋 The admin has ended the stream. Thank you for chatting with us!', false);
   showMessage('Stream ended', 'info');
 
   setTimeout(() => {
     location.reload();
-  }, 1000);
+  }, 2000);
 }
 
 function rejoinQueue() {
@@ -248,9 +277,70 @@ function showMessage(message, type = 'info') {
   messageEl.className = `message ${type}`;
   messageEl.textContent = message;
   messageBox.appendChild(messageEl);
-  
+
   setTimeout(() => {
     messageEl.remove();
   }, 5000);
+}
+
+// Chat Functions
+function addMessageToChat(text, isUser = false) {
+  const messagesArea = document.getElementById('messagesArea');
+  const messageGroup = document.createElement('div');
+  messageGroup.className = `message-group ${isUser ? 'user-message' : 'ai-message'}`;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'message-avatar';
+  avatar.textContent = isUser ? '👤' : '🤖';
+
+  const content = document.createElement('div');
+  content.className = 'message-content';
+
+  const paragraph = document.createElement('p');
+  paragraph.textContent = text;
+
+  content.appendChild(paragraph);
+
+  if (isUser) {
+    messageGroup.appendChild(content);
+    messageGroup.appendChild(avatar);
+  } else {
+    messageGroup.appendChild(avatar);
+    messageGroup.appendChild(content);
+  }
+
+  messagesArea.appendChild(messageGroup);
+
+  // Scroll to bottom
+  messagesArea.scrollTop = messagesArea.scrollHeight;
+}
+
+function sendMessage() {
+  const input = document.getElementById('messageInput');
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  // Add user message
+  addMessageToChat(text, true);
+  input.value = '';
+
+  // Send to server if streaming
+  if (isStreaming) {
+    socket.emit('visitor-message', { message: text });
+  }
+
+  // Get AI response after a short delay
+  setTimeout(() => {
+    const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+    addMessageToChat(randomResponse, false);
+  }, 500 + Math.random() * 1000);
+}
+
+function handleMessageKeypress(event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
 }
 
