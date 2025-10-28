@@ -22,6 +22,165 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Chatbox Styles */
+.chatbox-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 500px;
+  height: 90vh;
+  max-height: 800px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chatbox-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.chatbox-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.chatbox-avatar {
+  font-size: 32px;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chatbox-header-info h2 {
+  font-size: 16px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.chatbox-header-info p {
+  font-size: 12px;
+  margin: 4px 0 0 0;
+  opacity: 0.9;
+}
+
+.chatbox-status-text {
+  font-size: 12px !important;
+}
+
+.chatbox-header-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: pulse 2s infinite;
+}
+
+.status-dot.active {
+  background: #10b981;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.chatbox-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.chat-message-center {
+  text-align: center;
+  width: 100%;
+}
+
+.chat-message-center h3 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.chat-message-center p {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 0;
+}
+
+.queue-position-badge {
+  background: #667eea;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-top: 16px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.video-container-chat {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-container-chat video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.chatbox-footer {
+  padding: 16px;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .container {
   background: white;
   border-radius: 12px;

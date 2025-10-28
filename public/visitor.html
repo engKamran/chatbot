@@ -7,63 +7,53 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>💬 Chat with Admin</h1>
-      <p>Join the queue to stream with an available admin</p>
-    </div>
-
-    <div class="status">
-      <div class="status-item" id="statusConnection">
-        <label>Connection</label>
-        <div class="value">●</div>
+  <!-- Chatbox Container -->
+  <div class="chatbox-container">
+    <!-- Chat Header -->
+    <div class="chatbox-header">
+      <div class="chatbox-header-left">
+        <div class="chatbox-avatar">👨‍💼</div>
+        <div class="chatbox-header-info">
+          <h2>Admin Support</h2>
+          <p id="chatboxStatus" class="chatbox-status-text">Ready to connect</p>
+        </div>
       </div>
-      <div class="status-item" id="statusPosition">
-        <label>Position</label>
-        <div class="value">-</div>
-      </div>
-      <div class="status-item" id="statusAdmin">
-        <label>Admin</label>
-        <div class="value">●</div>
+      <div class="chatbox-header-right">
+        <div class="status-dot" id="chatboxStatusDot"></div>
       </div>
     </div>
 
-    <div id="messageBox"></div>
-
-    <!-- Join Queue Section -->
-    <div id="joinQueueSection">
-      <div class="info-box">
-        Enter your name and join the queue to stream with an admin.
-      </div>
-      <div class="input-group">
-        <input type="text" id="visitorName" placeholder="Enter your name" value="Visitor">
-        <button class="btn-primary" onclick="joinQueue()">Join Queue</button>
-      </div>
-    </div>
-
-    <!-- Waiting Section -->
-    <div id="waitingSection" style="display: none;">
-      <div class="info-box">
-        You are in the queue. Please wait for an admin to accept your request.
-      </div>
-      <div style="text-align: center; margin: 30px 0;">
-        <div style="font-size: 48px; margin-bottom: 20px;">⏳</div>
-        <p style="font-size: 18px; color: #666; margin-bottom: 20px;">
-          Position in queue: <strong id="queuePos">-</strong>
-        </p>
-        <button class="btn-secondary" onclick="leaveQueue()">Leave Queue</button>
-      </div>
-    </div>
-
-    <!-- Stream Section -->
-    <div id="streamSection" style="display: none;">
-      <div class="info-box">
-        <strong>📹 Admin Live Stream</strong> - Watch the admin's live broadcast
+    <!-- Chat Content -->
+    <div class="chatbox-content">
+      <!-- Join Queue Section -->
+      <div id="joinQueueSection" class="chat-section">
+        <div class="chat-message-center">
+          <div style="font-size: 48px; margin-bottom: 20px;">👋</div>
+          <h3>Welcome to Admin Support</h3>
+          <p>Enter your name and join the queue to chat with an available admin</p>
+          <div class="input-group" style="margin-top: 20px;">
+            <input type="text" id="visitorName" placeholder="Your name" value="Visitor">
+            <button class="btn-primary" onclick="joinQueue()">Join Queue</button>
+          </div>
+        </div>
       </div>
 
-      <div style="margin-bottom: 20px;">
-        <p style="text-align: center; color: #666; margin-bottom: 10px; font-weight: 600;">👨‍💼 Admin Live</p>
-        <div class="video-container" style="margin: 0; position: relative;">
+      <!-- Waiting Section -->
+      <div id="waitingSection" style="display: none;" class="chat-section">
+        <div class="chat-message-center">
+          <div style="font-size: 48px; margin-bottom: 20px; animation: spin 2s linear infinite;">⏳</div>
+          <h3>Waiting for Admin</h3>
+          <p>You're in the queue</p>
+          <div class="queue-position-badge">
+            Position: <strong id="queuePos">-</strong>
+          </div>
+          <button class="btn-secondary" onclick="leaveQueue()" style="margin-top: 20px;">Leave Queue</button>
+        </div>
+      </div>
+
+      <!-- Stream Section -->
+      <div id="streamSection" style="display: none;" class="chat-section">
+        <div class="video-container-chat" style="position: relative;">
           <video id="remoteVideo" autoplay playsinline></video>
 
           <!-- Loading Screen -->
@@ -74,36 +64,23 @@
               <p style="font-size: 12px; color: #999;">Please wait while we establish the connection</p>
             </div>
           </div>
-
-          <!-- Connecting Indicator (hidden by default) -->
-          <div id="adminConnectingIndicator" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white; z-index: 10; display: none;">
-            <div style="font-size: 48px; margin-bottom: 10px;">⏳</div>
-            <p>Connecting to Admin Live Stream...</p>
-          </div>
         </div>
       </div>
 
-      <div class="controls">
-        <button class="btn-danger" onclick="endStream()">Leave Stream</button>
+      <!-- Rejected Section -->
+      <div id="rejectedSection" style="display: none;" class="chat-section">
+        <div class="chat-message-center">
+          <div style="font-size: 48px; margin-bottom: 20px;">❌</div>
+          <h3>Request Rejected</h3>
+          <p>The admin declined your request</p>
+          <button class="btn-primary" onclick="rejoinQueue()" style="margin-top: 20px;">Try Again</button>
+        </div>
       </div>
     </div>
 
-    <!-- Rejected Section -->
-    <div id="rejectedSection" style="display: none;">
-      <div style="text-align: center; padding: 40px;">
-        <div style="font-size: 48px; margin-bottom: 20px;">❌</div>
-        <p style="font-size: 18px; color: #666; margin-bottom: 20px;">
-          Your request was rejected by the admin.
-        </p>
-        <button class="btn-primary" onclick="rejoinQueue()">Try Again</button>
-      </div>
-    </div>
-
-    <div class="queue-section">
-      <h3>📊 Queue Status</h3>
-      <div id="queueStatus" style="padding: 15px; background: white; border-radius: 4px; text-align: center;">
-        <p style="color: #666;">Waiting for queue update...</p>
-      </div>
+    <!-- Chat Footer -->
+    <div class="chatbox-footer" id="chatboxFooter" style="display: none;">
+      <button class="btn-danger btn-full" onclick="endStream()">Leave Stream</button>
     </div>
   </div>
 

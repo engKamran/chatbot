@@ -50,7 +50,7 @@ socket.on('reconnect', () => {
 socket.on('queue-position', (data) => {
   isInQueue = true;
   document.getElementById('joinQueueSection').style.display = 'none';
-  document.getElementById('waitingSection').style.display = 'block';
+  document.getElementById('waitingSection').style.display = 'flex';
   document.getElementById('queuePos').textContent = data.position;
   updateStatus('Queue Position', data.position.toString(), 'statusPosition');
 });
@@ -63,7 +63,8 @@ socket.on('queue-update', (data) => {
 socket.on('stream-accepted', async () => {
   isStreaming = true;
   document.getElementById('waitingSection').style.display = 'none';
-  document.getElementById('streamSection').style.display = 'block';
+  document.getElementById('streamSection').style.display = 'flex';
+  document.getElementById('chatboxFooter').style.display = 'block';
 
   // Show loading screen
   const loadingScreen = document.getElementById('loadingScreen');
@@ -125,7 +126,7 @@ socket.on('admin-ready', (data) => {
 socket.on('stream-rejected', () => {
   isInQueue = false;
   document.getElementById('waitingSection').style.display = 'none';
-  document.getElementById('rejectedSection').style.display = 'block';
+  document.getElementById('rejectedSection').style.display = 'flex';
   showMessage('Your request was rejected', 'error');
 });
 
@@ -173,7 +174,7 @@ function leaveQueue() {
   isInQueue = false;
   socket.disconnect();
   document.getElementById('waitingSection').style.display = 'none';
-  document.getElementById('joinQueueSection').style.display = 'block';
+  document.getElementById('joinQueueSection').style.display = 'flex';
   showMessage('Left the queue', 'info');
   setTimeout(() => {
     location.reload();
@@ -186,11 +187,12 @@ function endStream() {
   }
   socket.emit('stream-ended');
   isStreaming = false;
-  
+
   document.getElementById('streamSection').style.display = 'none';
-  document.getElementById('joinQueueSection').style.display = 'block';
+  document.getElementById('chatboxFooter').style.display = 'none';
+  document.getElementById('joinQueueSection').style.display = 'flex';
   showMessage('Stream ended', 'info');
-  
+
   setTimeout(() => {
     location.reload();
   }, 1000);
@@ -198,7 +200,7 @@ function endStream() {
 
 function rejoinQueue() {
   document.getElementById('rejectedSection').style.display = 'none';
-  document.getElementById('joinQueueSection').style.display = 'block';
+  document.getElementById('joinQueueSection').style.display = 'flex';
   showMessage('You can try joining again', 'info');
 }
 
@@ -210,18 +212,22 @@ function updateStatus(label, value, elementId) {
 }
 
 function updateConnectionStatus(status, type) {
-  const element = document.getElementById('statusConnection');
-  if (element) {
-    element.classList.remove('active', 'inactive');
-    element.classList.add(type);
+  const statusText = document.getElementById('chatboxStatus');
+  const statusDot = document.getElementById('chatboxStatusDot');
+  if (statusText) {
+    statusText.textContent = status;
+  }
+  if (statusDot) {
+    statusDot.classList.remove('active', 'inactive');
+    statusDot.classList.add(type);
   }
 }
 
 function updateAdminStatus(status, type) {
-  const element = document.getElementById('statusAdmin');
-  if (element) {
-    element.classList.remove('active', 'inactive');
-    element.classList.add(type);
+  // Status is now shown in the header
+  const statusText = document.getElementById('chatboxStatus');
+  if (statusText && type === 'active') {
+    statusText.textContent = 'Admin online';
   }
 }
 
