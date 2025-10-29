@@ -82,7 +82,7 @@ socket.on('stream-accepted', async () => {
   document.getElementById('leaveStreamBtn').style.display = 'block';
 
   // Add admin accepted message
-  addMessageToChat('🎉 An admin has accepted your request! You can now see their live stream below.', false);
+  addMessageToChat('🎉 You\'re connected! The admin\'s LIVE STREAM is loading below. Enjoy the broadcast!', false);
 
   // Show loading screen
   const loadingScreen = document.getElementById('loadingScreen');
@@ -191,7 +191,7 @@ function joinQueue() {
   document.getElementById('waitingSection').style.display = 'block';
 
   // Add greeting message
-  addMessageToChat(`Hi ${name}! 👋 Welcome to our support chat. You're now in the queue. An admin will be with you shortly. In the meantime, feel free to ask me anything!`, false);
+  addMessageToChat(`Hi ${name}! 👋 You've joined the queue. The admin is LIVE RIGHT NOW and will accept your request shortly. You'll be able to watch their live stream once accepted!`, false);
 
   socket.emit('visitor-join', { name });
   showMessage('Joined queue as ' + name, 'success');
@@ -219,7 +219,7 @@ function endStream() {
   document.getElementById('leaveStreamBtn').style.display = 'none';
   document.getElementById('joinQueueSection').style.display = 'block';
 
-  addMessageToChat('👋 The admin has ended the stream. Thank you for chatting with us!', false);
+  addMessageToChat('👋 The LIVE STREAM has ended. Thank you for watching! Feel free to join again when the admin goes live next time.', false);
   showMessage('Stream ended', 'info');
 
   setTimeout(() => {
@@ -241,14 +241,16 @@ function updateStatus(label, value, elementId) {
 }
 
 function updateConnectionStatus(status, type) {
-  const statusText = document.getElementById('chatboxStatus');
+  const statusText = document.getElementById('statusText');
   const statusDot = document.getElementById('chatboxStatusDot');
   if (statusText) {
     statusText.textContent = status;
   }
   if (statusDot) {
     statusDot.classList.remove('active', 'inactive');
-    statusDot.classList.add(type);
+    if (type === 'active') {
+      statusDot.classList.add('active');
+    }
   }
 }
 

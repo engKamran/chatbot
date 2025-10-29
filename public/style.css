@@ -78,6 +78,33 @@ body {
 
 .chatbox-status-text {
   font-size: 12px !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  animation: pulse-badge 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
 }
 
 .chatbox-header-right {
@@ -179,13 +206,31 @@ body {
 }
 
 .welcome-message .message-content p {
-  background: #eff6ff;
+  background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
   color: #1e40af;
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid #ef4444;
 }
 
 .welcome-message .message-content p:first-child {
   font-weight: 600;
+  font-size: 15px;
+}
+
+.welcome-message .message-content p:nth-child(2) {
+  background: linear-gradient(135deg, #fef2f2 0%, #fef3c7 100%);
+  color: #991b1b;
+  border-left: 4px solid #ef4444;
+  font-weight: 600;
+  animation: pulse-welcome 2s ease-in-out infinite;
+}
+
+@keyframes pulse-welcome {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
 }
 
 .chat-input-section {
