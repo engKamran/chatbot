@@ -13,6 +13,7 @@ let webrtcManager = null;
 let isInQueue = false;
 let isStreaming = false;
 let visitorName = 'Visitor';
+let isFullscreenVisitor = false;
 
 // AI Dummy responses
 const aiResponses = [
@@ -353,6 +354,41 @@ function handleMessageKeypress(event) {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     sendMessage();
+  }
+}
+
+function toggleFullscreenVisitor() {
+  const container = document.getElementById('fullscreenContainerVisitor');
+  const fullscreenVideo = document.getElementById('fullscreenVideoVisitor');
+  const remoteVideo = document.getElementById('remoteVideo');
+
+  if (!isFullscreenVisitor) {
+    // Enter fullscreen
+    isFullscreenVisitor = true;
+    container.style.display = 'flex';
+    container.style.alignItems = 'center';
+    container.style.justifyContent = 'center';
+
+    // Copy video stream to fullscreen video
+    if (remoteVideo && remoteVideo.srcObject) {
+      fullscreenVideo.srcObject = remoteVideo.srcObject;
+    }
+
+    // Try to use browser fullscreen API if available
+    if (container.requestFullscreen) {
+      container.requestFullscreen().catch(err => {
+        console.log('Fullscreen request failed:', err);
+      });
+    }
+  } else {
+    // Exit fullscreen
+    isFullscreenVisitor = false;
+    container.style.display = 'none';
+
+    // Exit browser fullscreen if active
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    }
   }
 }
 
