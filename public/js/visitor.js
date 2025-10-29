@@ -16,16 +16,21 @@ let visitorName = 'Visitor';
 
 // AI Dummy responses
 const aiResponses = [
-  "Thanks for reaching out! How can I help you today?",
+  "Thanks for reaching out! How can I help you today? 😊",
   "I'm here to assist you. What do you need?",
-  "Great question! Let me help you with that.",
+  "Great question! Let me help you with that. 💡",
   "I understand. Can you tell me more about your issue?",
-  "That's a common question. Here's what I can help with...",
-  "I'm processing your request. Please wait a moment.",
+  "That's a common question. I can definitely help with that!",
+  "I'm processing your request. Please wait a moment. ⏳",
   "Thanks for your patience. An admin will be with you shortly.",
   "Is there anything else I can help you with?",
-  "I appreciate your feedback. Let me escalate this to an admin.",
-  "You're welcome! Feel free to ask if you need anything else."
+  "I appreciate your feedback. An admin can help with more complex issues.",
+  "You're welcome! Feel free to ask if you need anything else. 👍",
+  "That's interesting! Tell me more about that.",
+  "I'm happy to help! What would you like to know?",
+  "Great! I'm here to make your experience better. 🎯",
+  "Feel free to ask me anything while you wait for the admin!",
+  "I'm always here to chat and help! What's on your mind?"
 ];
 
 // Initialize
@@ -192,6 +197,11 @@ function joinQueue() {
 
   // Add greeting message
   addMessageToChat(`Hi ${name}! 👋 You've joined the queue. The admin is LIVE RIGHT NOW and will accept your request shortly. You'll be able to watch their live stream once accepted!`, false);
+
+  // Add chat suggestion
+  setTimeout(() => {
+    addMessageToChat(`💬 While you wait, feel free to ask me anything! I'm here to help with quick questions or just chat.`, false);
+  }, 1000);
 
   socket.emit('visitor-join', { name });
   showMessage('Joined queue as ' + name, 'success');
