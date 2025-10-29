@@ -12,6 +12,7 @@ const socket = io({
 let webrtcManager = null;
 let isStreaming = false;
 let currentVisitor = null;
+let isFullscreen = false;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
@@ -92,18 +93,26 @@ socket.on('queue-update', (data) => {
   updateStatus('Queue Length', data.queueLength.toString(), 'statusQueue');
   updateQueueList(data.visitors);
 
+  // Update queue count
+  const queueCount = document.getElementById('queueCount');
+  if (queueCount) {
+    queueCount.textContent = data.queueLength;
+  }
+
   // Update next visitor name and show/hide controls
   if (data.visitors && data.visitors.length > 0) {
     document.getElementById('nextVisitorName').textContent = data.visitors[0].name;
     // Show accept/reject buttons only when there are visitors in queue and not streaming
     if (!isStreaming) {
       document.getElementById('queueControlsSection').style.display = 'block';
+      document.getElementById('queueSection').style.display = 'block';
     }
   } else {
     document.getElementById('nextVisitorName').textContent = 'Waiting for visitors...';
     // Hide accept/reject buttons when queue is empty
     if (!isStreaming) {
       document.getElementById('queueControlsSection').style.display = 'none';
+      document.getElementById('queueSection').style.display = 'none';
     }
   }
 });
@@ -113,11 +122,13 @@ socket.on('visitor-accepted', (data) => {
   isStreaming = true;
   document.getElementById('currentVisitorName').textContent = data.visitorName;
   updateStatus('Stream Status', 'Active', 'statusStream');
+  updateConnectionStatus('Streaming', 'active');
 
   // Hide queue controls and show video section
   document.getElementById('queueControlsSection').style.display = 'none';
   document.getElementById('videoSection').style.display = 'block';
   document.getElementById('queueSection').style.display = 'none';
+  document.getElementById('endStreamBtn').style.display = 'block';
 
   // Move stream from hidden element to visible element
   const hiddenVideoElement = document.getElementById('localVideoHidden');
@@ -126,6 +137,9 @@ socket.on('visitor-accepted', (data) => {
     visibleVideoElement.srcObject = hiddenVideoElement.srcObject;
     console.log('Local stream moved to visible video element');
   }
+
+  // Add message to chat
+  addMessageToChat(`🎥 Connected with ${data.visitorName}! Your stream is now LIVE!`, true);
 
   showMessage('Connected with ' + data.visitorName + '! Starting stream...', 'success');
 
@@ -193,12 +207,23 @@ function endStream() {
   isStreaming = false;
   currentVisitor = null;
 
+  // Exit fullscreen if active
+  if (isFullscreen) {
+    toggleFullscreen();
+  }
+
   // Hide video section and show queue controls
   document.getElementById('videoSection').style.display = 'none';
+  document.getElementById('endStreamBtn').style.display = 'none';
   document.getElementById('queueControlsSection').style.display = 'block';
   document.getElementById('queueSection').style.display = 'block';
 
   updateStatus('Stream Status', 'Idle', 'statusStream');
+  updateConnectionStatus('Ready to stream', 'active');
+
+  // Add message to chat
+  addMessageToChat('👋 Stream ended. Ready for the next visitor!', true);
+
   showMessage('Stream ended. Ready for next visitor!', 'info');
 
   // Reinitialize for next stream
@@ -253,9 +278,89 @@ function showMessage(message, type = 'info') {
   messageEl.className = `message ${type}`;
   messageEl.textContent = message;
   messageBox.appendChild(messageEl);
-  
+
   setTimeout(() => {
     messageEl.remove();
   }, 5000);
+}
+
+function toggleFullscreen() {
+  const container = document.getElementById('fullscreenContainer');
+  const fullscreenVideo = document.getElementById('fullscreenVideo');
+  const localVideo = document.getElementById('localVideo');
+
+  if (!isFullscreen) {
+    // Enter fullscreen
+    isFullscreen = true;
+    container.style.display = 'flex';
+    container.style.alignItems = 'center';
+    container.style.justifyContent = 'center';
+
+    // Copy video stream to fullscreen video
+    if (localVideo && localVideo.srcObject) {
+      fullscreenVideo.srcObject = localVideo.srcObject;
+    }
+
+    // Try to use browser fullscreen API if available
+    if (container.requestFullscreen) {
+      container.requestFullscreen().catch(err => {
+        console.log('Fullscreen request failed:', err);
+      });
+    }
+  } else {
+    // Exit fullscreen
+    isFullscreen = false;
+    container.style.display = 'none';
+
+    // Exit browser fullscreen if active
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    }
+  }
+}
+
+function addMessageToChat(text, isAdmin = false) {
+  const messagesArea = document.getElementById('messagesArea');
+  const messageGroup = document.createElement('div');
+  messageGroup.className = `message-group ${isAdmin ? 'user-message' : 'ai-message'}`;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'message-avatar';
+  avatar.textContent = isAdmin ? '👨‍💼' : '👤';
+
+  const content = document.createElement('div');
+  content.className = 'message-content';
+
+  const paragraph = document.createElement('p');
+  paragraph.textContent = text;
+
+  content.appendChild(paragraph);
+
+  if (isAdmin) {
+    messageGroup.appendChild(content);
+    messageGroup.appendChild(avatar);
+  } else {
+    messageGroup.appendChild(avatar);
+    messageGroup.appendChild(content);
+  }
+
+  messagesArea.appendChild(messageGroup);
+
+  // Scroll to bottom
+  messagesArea.scrollTop = messagesArea.scrollHeight;
+}
+
+function updateConnectionStatus(status, type) {
+  const statusText = document.getElementById('statusText');
+  const statusDot = document.getElementById('chatboxStatusDot');
+  if (statusText) {
+    statusText.textContent = status;
+  }
+  if (statusDot) {
+    statusDot.classList.remove('active', 'inactive');
+    if (type === 'active') {
+      statusDot.classList.add('active');
+    }
+  }
 }
 

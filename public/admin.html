@@ -7,74 +7,90 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>👨‍💼 Admin Dashboard</h1>
-      <p>Manage visitor queue and live stream</p>
-    </div>
-
-    <div class="status">
-      <div class="status-item" id="statusAdmin">
-        <label>Status</label>
-        <div class="value">●</div>
+  <div class="admin-chatbox-container">
+    <!-- Chat Header -->
+    <div class="chatbox-header">
+      <div class="chatbox-header-left">
+        <div class="chatbox-avatar">📡</div>
+        <div class="chatbox-header-info">
+          <h2>Live Stream Control</h2>
+          <p id="chatboxStatus" class="chatbox-status-text">
+            <span class="live-badge">🔴 LIVE</span>
+            <span id="statusText">Ready to stream</span>
+          </p>
+        </div>
       </div>
-      <div class="status-item" id="statusQueue">
-        <label>Queue</label>
-        <div class="value">0</div>
-      </div>
-      <div class="status-item" id="statusStream">
-        <label>Stream</label>
-        <div class="value">●</div>
+      <div class="chatbox-header-right">
+        <div class="status-dot active" id="chatboxStatusDot"></div>
       </div>
     </div>
 
-    <div id="messageBox"></div>
-
-    <!-- Queue Controls Section -->
-    <div id="queueControlsSection" style="display: none;">
-      <div class="info-box">
-        <strong>Next Visitor:</strong> <span id="nextVisitorName">Waiting for visitors...</span>
-      </div>
-      <div class="controls">
-        <button class="btn-success" id="acceptBtn" onclick="acceptVisitor()">✓ Accept Visitor</button>
-        <button class="btn-danger" id="rejectBtn" onclick="rejectVisitor()">✗ Reject Visitor</button>
-      </div>
-    </div>
-
-    <!-- Video Section -->
-    <div id="videoSection" style="display: none;">
-      <div class="info-box">
-        <strong>Streaming with:</strong> <span id="currentVisitorName">-</span>
-      </div>
-
-      <div style="margin-bottom: 20px;">
-        <div class="video-container" style="margin: 0; aspect-ratio: 16/9;">
-          <video id="localVideo" autoplay muted playsinline style="width: 100%; height: 100%; object-fit: contain;"></video>
+    <!-- Chat Content -->
+    <div class="chatbox-content">
+      <!-- Messages/Queue Area -->
+      <div id="messagesArea" class="messages-area">
+        <div class="message-group welcome-message">
+          <div class="message-avatar">📡</div>
+          <div class="message-content">
+            <p><strong>Welcome to Live Stream Control!</strong></p>
+            <p>🔴 You're LIVE and ready to stream!</p>
+            <p>Manage your visitor queue and start streaming below.</p>
+          </div>
         </div>
       </div>
 
-      <div class="controls">
-        <button class="btn-secondary" id="endStreamBtn" onclick="endStream()">End Stream</button>
+      <!-- Queue Controls Section -->
+      <div id="queueControlsSection" style="display: none;" class="chat-input-section">
+        <div class="queue-info">
+          <div class="queue-position-info">
+            <p>📍 Next Visitor: <strong id="nextVisitorName">Waiting...</strong></p>
+            <p class="queue-hint">👥 Queue: <strong id="queueCount">0</strong> waiting</p>
+          </div>
+        </div>
+        <div class="controls" style="display: flex; gap: 8px; margin-top: 12px;">
+          <button class="btn-success" id="acceptBtn" onclick="acceptVisitor()" style="flex: 1;">✓ Accept</button>
+          <button class="btn-danger" id="rejectBtn" onclick="rejectVisitor()" style="flex: 1;">✗ Reject</button>
+        </div>
       </div>
+
+      <!-- Video Section -->
+      <div id="videoSection" style="display: none;" class="chat-input-section">
+        <div class="queue-info">
+          <p>🎥 Streaming with: <strong id="currentVisitorName">-</strong></p>
+        </div>
+        <div class="video-container-chat" style="position: relative; height: 300px; margin: 12px 0;">
+          <video id="localVideo" autoplay muted playsinline style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"></video>
+          <button class="btn-fullscreen" id="fullscreenBtn" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+        </div>
+      </div>
+
+      <!-- Queue List -->
+      <div id="queueSection" style="display: none;" class="chat-input-section">
+        <p style="font-size: 12px; color: #666; margin: 0 0 8px 0;">📋 Visitor Queue:</p>
+        <ul class="queue-list" id="queueList" style="margin: 0; padding: 0; list-style: none;">
+          <li class="queue-item" style="color: #999; font-size: 12px;">No visitors in queue</li>
+        </ul>
+      </div>
+
+      <!-- Hidden video element for camera initialization -->
+      <video id="localVideoHidden" autoplay muted playsinline style="display: none; width: 1px; height: 1px;"></video>
     </div>
 
-    <!-- Hidden video element for camera initialization -->
-    <video id="localVideoHidden" autoplay muted playsinline style="display: none; width: 1px; height: 1px;"></video>
-
-    <div id="noQueueMessage" class="info-box" style="text-align: center;">
-      Waiting for visitors to join the queue...
-    </div>
-
-    <div class="queue-section" id="queueSection">
-      <h3>📋 Visitor Queue</h3>
-      <ul class="queue-list" id="queueList">
-        <li class="queue-item" style="color: #999;">No visitors in queue</li>
-      </ul>
+    <!-- Chat Footer -->
+    <div class="chatbox-footer">
+      <div id="messageBox" style="padding: 8px 16px; font-size: 12px;"></div>
+      <button class="btn-danger btn-full" id="endStreamBtn" onclick="endStream()" style="display: none; margin: 8px 16px 0 16px;">End Stream</button>
     </div>
   </div>
 
   <!-- Hidden remote video element for admin -->
   <video id="remoteVideo" style="display: none;"></video>
+
+  <!-- Fullscreen video container -->
+  <div id="fullscreenContainer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999;">
+    <video id="fullscreenVideo" autoplay muted playsinline style="width: 100%; height: 100%; object-fit: contain;"></video>
+    <button class="btn-fullscreen-close" onclick="toggleFullscreen()" title="Exit Fullscreen">✕</button>
+  </div>
 
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
   <script src="/js/webrtc-utils.js"></script>
